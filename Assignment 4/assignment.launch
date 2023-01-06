@@ -1,0 +1,40 @@
+<launch>
+
+    <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]">
+    </arg>
+    <arg name="x_pos" default="0.0"/>
+    <arg name="y_pos" default="0.0"/>
+    <arg name="z_pos" default="0.0"/>
+    <arg name="world_name" default="worlds/empty.world"/>
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>
+
+    <param name = "robot_description" command = "$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+    <node 
+    pkg = "gazebo_ros" 
+    type = "spawn_model" 
+    name = "spawn_urdf"
+    args = "-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" /> 
+
+    <!-- this will open the question_1.py file and run it  -->
+    <node name = "sensed_object" pkg = "hrtkassign3" type = "question_1.py" />
+
+    <!-- similar to the previous one this one will run the question_2.py -->
+    <node name = "drive_robot" pkg = "hrtkassign3" type = "question_2.py" required = "true" />
+
+    <!-- for question_3.py  -->
+    <node name = "report_pose" pkg = "hrtkassign3" type = "question_3.py" output = "screen" launch-prefix = "xterm -e"/>
+
+    <!-- launching rqt gracph -->
+    <node name = "rqt_graph" pkg = "rqt_graph" type = "rqt_graph" />
+
+<!-- closing the lauch -->
+</launch>
